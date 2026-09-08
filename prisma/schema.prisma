@@ -1,0 +1,248 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth & Users ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(CUSTOMER)
+  firstName     String
+  lastName      String
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        Order[]
+  addresses     Address[]
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String?
+  label     String?           // "Home", "Office", …
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  country   String  @default("US")
+  zipCode   String?
+  phone     String?
+
+  user      User?    @relation(fields: [userId], references: [id])
+  orders    Order[]
+}
+
+// ─── Catalogue ────────────────────────────────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int       @default(0)
+  products    Product[]
+}
+
+model Product {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String?
+  categoryId    String
+  basePrice     Int            // cents (USD)
+  currency      String         @default("USD")
+  isActive      Boolean        @default(true)
+  images        ProductImage[]
+  variants      ProductVariant[]
+  category      Category       @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model ProductVariant {
+  id            String     @id @default(cuid())
+  productId     String
+  sku           String     @unique
+  name          String     // e.g. "Black / XL"
+  priceOverride Int?       // cents; null → use basePrice
+  currency      String     @default("USD")
+  product       Product    @relation(fields: [productId], references: [id])
+  inventory     Inventory?
+  orderItems    OrderItem[]
+}
+
+model Inventory {
+  id                String         @id @default(cuid())
+  variantId         String         @unique
+  quantityOnHand    Int            @default(0)
+  lowStockThreshold Int            @default(5)
+  variant           ProductVariant @relation(fields: [variantId], references: [id])
+  updatedAt         DateTime       @updatedAt
+}
+
+// ─── Experience Packages ──────────────────────────────────────────────────────
+
+model ExperiencePackage {
+  id             String              @id @default(cuid())
+  name           String
+  slug           String              @unique
+  description    String?
+  price          Int                 // cents (USD)
+  currency       String              @default("USD")
+  isActive       Boolean             @default(true)
+  deliveryInfo   String?             // "Delivered within 7 days"
+  requiredFields Json                // drives dynamic form + validation
+  imageUrl       String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  requests       ExperienceRequest[]
+}
+
+model ExperienceRequest {
+  id              String                  @id @default(cuid())
+  packageId       String
+  orderId         String?
+  orderItemId     String?                 @unique
+  status          ExperienceRequestStatus @default(PENDING_PAYMENT)
+  submittedData   Json                    // fan's answers to requiredFields
+  adminNotes      String?
+  deliverableUrl  String?
+  deliverableType String?                 // "video", "link", "file", …
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  package   ExperiencePackage @relation(fields: [packageId], references: [id])
+  order     Order?            @relation(fields: [orderId], references: [id])
+  orderItem OrderItem?        @relation(fields: [orderItemId], references: [id])
+}
+
+enum ExperienceRequestStatus {
+  PENDING_PAYMENT
+  PENDING_REVIEW
+  ACCEPTED
+  IN_PROGRESS
+  DELIVERED
+  REJECTED
+  CANCELLED
+  REFUNDED
+}
+
+// ─── Orders & Payments ────────────────────────────────────────────────────────
+
+model Order {
+  id                String      @id @default(cuid())
+  orderNumber       String      @unique // e.g. "DIR-20250615-A3F2"
+  userId            String?
+  guestEmail        String?
+  guestPhone        String?
+  guestName         String?
+  status            OrderStatus @default(PENDING_PAYMENT)
+  subtotalAmount    Int         // cents
+  totalAmount       Int         // cents
+  currency          String      @default("USD")
+  shippingAddressId String?
+  notes             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  user            User?              @relation(fields: [userId], references: [id])
+  shippingAddress Address?           @relation(fields: [shippingAddressId], references: [id])
+  items           OrderItem[]
+  payments        Payment[]
+  experiences     ExperienceRequest[]
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PARTIALLY_FULFILLED
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}
+
+model OrderItem {
+  id                String            @id @default(cuid())
+  orderId           String
+  variantId         String?           // null for experience items
+  experienceId      String?           // package ID for experience items
+  quantity          Int               @default(1)
+  unitPrice         Int               // cents
+  currency          String            @default("USD")
+  fulfillmentStatus FulfillmentStatus @default(UNFULFILLED)
+
+  order             Order              @relation(fields: [orderId], references: [id])
+  variant           ProductVariant?   @relation(fields: [variantId], references: [id])
+  experienceRequest ExperienceRequest?
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// Payment.provider can be "stripe" | "paystack" | "paypal" | "cashapp"
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String
+  provider      String        @default("stripe")
+  providerRef   String?       // provider transaction reference (opaque)
+  providerTxId  String?       // provider transaction ID from verify/webhook
+  amount        Int           // cents
+  currency      String        @default("USD")
+  status        PaymentStatus @default(PENDING)
+  providerMeta  Json?         // raw provider response for audit
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+// WebhookEvent idempotency log — (provider, providerEventId) must be unique
+model WebhookEvent {
+  id              String    @id @default(cuid())
+  provider        String    // "stripe", "paystack", "paypal", "cashapp"
+  providerEventId String    // e.g. Stripe evt_xxx
+  eventType       String    // e.g. "charge.succeeded"
+  payload         Json
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@unique([provider, providerEventId])
+}
