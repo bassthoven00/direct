@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,7 +9,7 @@ export default function HomePage() {
     <>
       <Navbar />
 
-      {/* ── Hero ────────────────────────────────────────────── */}
+      {/* Hero */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
         {/* Gradient blob */}
         <div className="absolute inset-0 pointer-events-none">
@@ -44,7 +46,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── How It Works ────────────────────────────────────── */}
+      {/* How It Works */}
       <section className="max-w-6xl mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold text-white text-center mb-12">
           How It Works
@@ -64,7 +66,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Featured Experiences ─────────────────────────────── */}
+      {/* Featured Experiences */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-white">Featured Experiences</h2>
@@ -79,9 +81,8 @@ export default function HomePage() {
             { name: "Custom Pep Talk", price: "$190", tag: "Motivation", desc: "An exclusive motivational message crafted just for you." },
           ].map((pkg) => (
             <div key={pkg.name} className="group rounded-2xl border border-white/10 bg-white/5 overflow-hidden hover:border-purple-500/40 transition-all hover:shadow-xl hover:shadow-purple-500/10">
-              {/* Placeholder image area */}
               <div className="h-48 bg-gradient-to-br from-purple-900/50 to-pink-900/30 flex items-center justify-center">
-                <span className="text-5xl">🌟</span>
+                <span className="text-5xl">🎟️</span>
               </div>
               <div className="p-6">
                 <span className="text-xs text-purple-400 font-semibold uppercase tracking-wider">{pkg.tag}</span>
@@ -99,7 +100,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Merch Banner ─────────────────────────────────────── */}
+      {/* Merch Banner */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-purple-900/40 to-pink-900/30 p-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
@@ -115,7 +116,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Social Proof ─────────────────────────────────────── */}
+      {/* Social Proof */}
       <section className="max-w-6xl mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold text-white text-center mb-12">What Fans Are Saying</h2>
         <div className="grid md:grid-cols-3 gap-6">
@@ -125,7 +126,7 @@ export default function HomePage() {
             { quote: "Super easy to order and delivered so fast. Will definitely be back.", author: "Priya K." },
           ].map((t) => (
             <div key={t.author} className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <p className="text-gray-300 text-sm leading-relaxed mb-4">&quot;{t.quote}&quot;</p>
+              <p className="text-gray-300 text-sm leading-relaxed mb-4">"{t.quote}"</p>
               <span className="text-purple-400 font-semibold text-sm">— {t.author}</span>
             </div>
           ))}
