@@ -1,0 +1,49 @@
+/**
+ * docker-compose.yml
+ *
+ * Local development environment — PostgreSQL + Redis + MailHog.
+ * Run: docker compose up -d
+ *
+ * Do NOT use this in production. See ARCHITECTURE.md §14 for the production topology.
+ */
+
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: direct_user
+      POSTGRES_PASSWORD: direct_pass
+      POSTGRES_DB: direct_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U direct_user -d direct_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI — view emails at http://localhost:8025
+
+volumes:
+  postgres_data:

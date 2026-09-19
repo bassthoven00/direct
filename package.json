@@ -6,21 +6,55 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1131.0",
+    "@aws-sdk/s3-request-presigner": "^3.1131.0",
+    "@prisma/client": "^7.10.0",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.1.0",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.3",
+    "bullmq": "^6.3.4",
+    "clsx": "^2.1.1",
+    "ioredis": "^6.0.0",
+    "jose": "^6.2.12",
+    "next": "14.2.35",
+    "prisma": "^8.0.0-rc.13",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.35"
+    "resend": "^6.28.0",
+    "stripe": "^22.6.2",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.6.2"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^8",
-    "eslint-config-next": "14.2.35"
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5",
+    "vitest": "^5.0.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }
