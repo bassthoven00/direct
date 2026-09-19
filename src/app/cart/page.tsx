@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -19,6 +20,7 @@ const SHIPPING_COST = 899;        // $8.99 in cents
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -29,6 +31,7 @@ export default function CartPage() {
   const persist = useCallback((updated: CartItem[]) => {
     setItems(updated);
     localStorage.setItem("cart_items", JSON.stringify(updated));
+    window.dispatchEvent(new Event("cart_updated"));
   }, []);
 
   const updateQty = (id: string, delta: number) => {
@@ -57,7 +60,7 @@ export default function CartPage() {
         <h1 className="text-3xl font-bold text-white mb-10">Your Cart</h1>
 
         {items.length === 0 ? (
-          /* ── Empty state ── */
+          /* Empty state */
           <div className="text-center py-24">
             <div className="text-7xl mb-6">🛒</div>
             <h2 className="text-2xl font-bold text-white mb-3">Your cart is empty</h2>
@@ -73,19 +76,19 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* ── Items list ── */}
+            {/* Items list */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
                 <div key={item.id} className="rounded-2xl border border-white/10 bg-white/5 p-5 flex gap-4 items-center">
                   {/* Icon placeholder */}
                   <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-900/60 to-pink-900/40 flex items-center justify-center flex-shrink-0 text-2xl">
-                    {item.type === "experience" ? "🌟" : "📦"}
+                    {item.type === "experience" ? "🎟️" : "📦"}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <p className="text-white font-semibold truncate">{item.name}</p>
                     <p className="text-sm text-gray-400 capitalize">{item.type}</p>
-                    <p className="text-purple-400 font-bold mt-1">${(item.price / 100).toFixed(2)}</p>
+                    <p className="text-purple-400 font-bold mt-1">${(item.price / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                   </div>
 
                   {/* Quantity controls */}
@@ -94,7 +97,7 @@ export default function CartPage() {
                       onClick={() => updateQty(item.id, -1)}
                       className="w-8 h-8 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors flex items-center justify-center"
                     >
-                      −
+                      -
                     </button>
                     <span className="text-white font-semibold w-6 text-center">{item.quantity}</span>
                     <button
@@ -107,7 +110,7 @@ export default function CartPage() {
 
                   {/* Line total */}
                   <p className="text-white font-bold w-20 text-right">
-                    ${((item.price * item.quantity) / 100).toFixed(2)}
+                    ${((item.price * item.quantity) / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </p>
 
                   {/* Remove */}
@@ -122,7 +125,7 @@ export default function CartPage() {
               ))}
             </div>
 
-            {/* ── Order Summary ── */}
+            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sticky top-24">
                 <h2 className="text-lg font-bold text-white mb-6">Order Summary</h2>
@@ -130,7 +133,7 @@ export default function CartPage() {
                 <div className="space-y-3 text-sm mb-6">
                   <div className="flex justify-between text-gray-400">
                     <span>Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>
-                    <span className="text-white">${(subtotal / 100).toFixed(2)}</span>
+                    <span className="text-white">${(subtotal / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                   </div>
                   <div className="flex justify-between text-gray-400">
                     <span>Shipping</span>
@@ -145,7 +148,7 @@ export default function CartPage() {
                   )}
                   <div className="border-t border-white/10 pt-3 flex justify-between text-white font-bold text-base">
                     <span>Total</span>
-                    <span>${(total / 100).toFixed(2)}</span>
+                    <span>${(total / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                   </div>
                 </div>
 
@@ -161,7 +164,7 @@ export default function CartPage() {
                       returnUrl: "/cart"
                     };
                     localStorage.setItem("checkout_session", JSON.stringify(session));
-                    window.location.href = "/checkout";
+                    router.push("/checkout");
                   }}
                   className="block w-full text-center py-3.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-semibold transition-all shadow-lg shadow-purple-500/25"
                 >

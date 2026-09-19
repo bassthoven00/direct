@@ -100,7 +100,7 @@ export default function CheckoutPage() {
       <main className="max-w-6xl mx-auto px-4 py-12 pb-24">
         {session.status === "submitted" ? (
           <div className="max-w-xl mx-auto text-center py-16">
-            <div className="text-6xl mb-6">🎉</div>
+            <div className="text-6xl mb-6">✅</div>
             <h1 className="text-3xl font-bold text-white mb-4">Payment Submitted</h1>
             <p className="text-gray-400 mb-8">
               We&apos;ve received your payment notification. Your {session.source === "cart" ? "order" : "booking"} is now awaiting confirmation.
@@ -110,6 +110,7 @@ export default function CheckoutPage() {
                 localStorage.removeItem("checkout_session");
                 if (session.source === "cart") {
                   localStorage.removeItem("cart_items");
+                  window.dispatchEvent(new Event("cart_updated"));
                 }
                 router.push("/");
               }}
@@ -135,7 +136,7 @@ export default function CheckoutPage() {
                             <p className="text-white font-medium">{item.name}</p>
                             <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
                           </div>
-                          <p className="text-white font-bold">${((item.price * item.quantity) / 100).toFixed(2)}</p>
+                          <p className="text-white font-bold">${((item.price * item.quantity) / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                         </div>
                       ))}
                     </div>
@@ -148,14 +149,14 @@ export default function CheckoutPage() {
                           <p className="text-purple-400 text-xs font-bold uppercase tracking-wider mb-1">Experience</p>
                           <p className="text-white font-medium text-lg">{session.experience.name}</p>
                         </div>
-                        <p className="text-white font-bold text-lg">${(session.experience.price / 100).toFixed(2)}</p>
+                        <p className="text-white font-bold text-lg">${(session.experience.price / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                       </div>
                     </div>
                   )}
 
                   <div className="flex justify-between items-center text-xl font-bold text-white pt-4 border-t border-white/10">
                     <span>Total Due</span>
-                    <span>${(session.total / 100).toFixed(2)}</span>
+                    <span>${(session.total / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                   </div>
                 </div>
               </div>
@@ -172,7 +173,7 @@ export default function CheckoutPage() {
 
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
                   <p className="text-sm text-gray-400 mb-6">
-                    Please transfer exactly <strong className="text-white">${(session.total / 100).toFixed(2)}</strong> to the bank account below.
+                    Please transfer exactly <strong className="text-white">${(session.total / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong> to the bank account below.
                   </p>
 
                   <div className="space-y-4 mb-8">

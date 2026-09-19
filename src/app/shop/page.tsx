@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const PRODUCTS = [
   { id: "prod-1", name: "Signature Hoodie", category: "Apparel", price: 16500, description: "Premium heavyweight cotton hoodie with embroidered logo.", emoji: "👕", colors: ["Black", "White", "Purple"] },
-  { id: "prod-2", name: "Classic Logo Tee", category: "Apparel", price: 9000, description: "Soft 100% organic cotton tee, pre-shrunk.", emoji: "👔", colors: ["Black", "White"] },
+  { id: "prod-2", name: "Classic Logo Tee", category: "Apparel", price: 9000, description: "Soft 100% organic cotton tee, pre-shrunk.", emoji: "👕", colors: ["Black", "White"] },
   { id: "prod-3", name: "Snapback Cap", category: "Accessories", price: 7000, description: "Adjustable snapback with embroidered logo.", emoji: "🧢", colors: ["Black", "Purple"] },
-  { id: "prod-4", name: "Limited Art Print", category: "Collectibles", price: 11500, description: "Numbered limited edition 12×18\" art print, signed.", emoji: "🖼️", colors: ["Standard"] },
+  { id: "prod-4", name: "Limited Art Print", category: "Collectibles", price: 11500, description: "Numbered limited edition 12\"x18\" art print, signed.", emoji: "🖼️", colors: ["Standard"] },
   { id: "prod-5", name: "Enamel Pin Set", category: "Accessories", price: 4000, description: "Set of 3 collectible enamel pins in a gift box.", emoji: "📌", colors: ["Standard"] },
-  { id: "prod-6", name: "Autograph Poster", category: "Collectibles", price: 20000, description: "High-quality 18×24\" poster, hand-signed and shipped in a tube.", emoji: "✍️", colors: ["Standard"] },
+  { id: "prod-6", name: "Autograph Poster", category: "Collectibles", price: 20000, description: "High-quality 18\"x24\" poster, hand-signed and shipped in a tube.", emoji: "📜", colors: ["Standard"] },
 ];
 
 const CATEGORIES = ["All", "Apparel", "Accessories", "Collectibles"];
@@ -40,8 +41,10 @@ export default function ShopPage() {
       existing.push({ id: product.id, name: product.name, price: product.price, quantity: 1, type: "product" });
     }
     localStorage.setItem("cart_items", JSON.stringify(existing));
+    window.dispatchEvent(new Event("cart_updated"));
+    
     setToast(`${product.name} added to cart!`);
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 4000);
   };
 
   return (
@@ -50,8 +53,11 @@ export default function ShopPage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl shadow-purple-500/30 text-sm font-medium animate-bounce">
-          ✓ {toast}
+        <div className="fixed bottom-6 right-6 z-50 bg-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl shadow-purple-500/30 text-sm font-medium animate-bounce flex items-center gap-3">
+          <span>🎉 {toast}</span>
+          <Link href="/cart" className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-full text-xs transition-colors">
+            View Cart
+          </Link>
         </div>
       )}
 
