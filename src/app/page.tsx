@@ -21,13 +21,13 @@ export default function HomePage() {
             Exclusive Access
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6">
-            Direct Fan<br />
+            Your Star<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Experiences
+              Pass
             </span>
           </h1>
           <p className="max-w-xl mx-auto text-gray-400 text-lg mb-10">
-            Personalized video messages, exclusive merchandise, and once-in-a-lifetime moments — direct from the source.
+            Personalized video messages, exclusive merchandise, and once-in-a-lifetime moments — your pass to the stars.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
