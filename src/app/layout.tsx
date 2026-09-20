@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "StarPass — Fan Experiences & Merch",
-  description: "Personalized star-powered experiences and exclusive merchandise. Your pass to unforgettable fan moments.",
+  title: "Direct — Fan Experiences & Merch",
+  description: "Personalized celebrity experiences and exclusive merchandise, direct from the source.",
 };
 
 export default function RootLayout({

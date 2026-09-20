@@ -183,7 +183,7 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Account Name</label>
-                      <p className="text-white font-medium">StarPass LLC</p>
+                      <p className="text-white font-medium">Direct Platform LLC</p>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Account Number</label>

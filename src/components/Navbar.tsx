@@ -71,7 +71,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="text-xl font-bold tracking-tight text-white">
-            Star<span className="text-purple-400">Pass</span>
+            Direct<span className="text-purple-400">.</span>
           </Link>
         </div>
 
